@@ -2,7 +2,7 @@
 // Change API_BASE if your backend runs somewhere other than localhost:8000.
 const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
   ? "http://127.0.0.1:8000"
-  : ""; // same-origin if served behind the backend / a reverse proxy
+  : "https://fleetflow-backend-63rt.onrender.com"; // same-origin if served behind the backend / a reverse proxy
 
 let cache = { vehicles: [], drivers: [], shipments: [], trips: [] };
 
