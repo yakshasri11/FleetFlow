@@ -95,7 +95,7 @@ def create_trip(
     db_trip = models.Trip(
         driver_id=trip.driver_id,
         vehicle_id=trip.vehicle_id,
-        scheduled_start=trip.scheduled_start,
+        scheduled_start=trip.scheduled_start or datetime.utcnow(),
         scheduled_end=trip.scheduled_end,
     )
     db.add(db_trip)
