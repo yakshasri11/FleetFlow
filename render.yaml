@@ -1,0 +1,29 @@
+# Render.com blueprint — free-tier deployment.
+# Push this repo to GitHub, then in Render: New -> Blueprint -> pick this repo.
+# Render reads this file and creates the web service + free Postgres database
+# automatically. See README.md "Deployment" section for the full walkthrough.
+
+databases:
+  - name: fleetflow-db
+    plan: free
+    databaseName: fleetflow_db
+    user: fleetflow
+
+services:
+  - type: web
+    name: fleetflow-backend
+    plan: free
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fleetflow-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: REDIS_URL
+        sync: false   # set manually — see README (Upstash free Redis works well here)
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false   # optional — leave unset to use the free local route estimator

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FleetFlow — Logistics Management</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23e08a2c'/%3E%3Cpath d='M2 18c3-4 6-4 8-1s5 3 8-1' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' fill='none' opacity='0.55'/%3E%3Crect x='3' y='7' width='10' height='7' rx='1' fill='%23fff'/%3E%3Cpath d='M13 9h3.2c.4 0 .8.2 1 .6l1.8 2.6c.2.3.3.6.3 1V14h-6.3V9Z' fill='%23fff'/%3E%3Ccircle cx='7' cy='15.2' r='1.5' fill='%23e08a2c'/%3E%3Ccircle cx='16.5' cy='15.2' r='1.5' fill='%23e08a2c'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 18c3-4 6-4 8-1s5 3 8-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.55"/>
+          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
+          <path d="M13 9h3.2c.4 0 .8.2 1 .6l1.8 2.6c.2.3.3.6.3 1V14h-6.3V9Z" fill="currentColor"/>
+          <circle cx="7" cy="15.2" r="1.5" fill="#fff"/>
+          <circle cx="7" cy="15.2" r="0.7" fill="currentColor"/>
+          <circle cx="16.5" cy="15.2" r="1.5" fill="#fff"/>
+          <circle cx="16.5" cy="15.2" r="0.7" fill="currentColor"/>
+        </svg>
+      </span>
+      <div>
+        <div class="brand-name">FleetFlow</div>
+        <div class="brand-sub">Logistics Management System</div>
+      </div>
+    </div>
+
+    <div class="login-tabs" id="login-tabs">
+      <button class="tab-btn active" data-tab="login">Sign in</button>
+      <button class="tab-btn" data-tab="register">First-time setup</button>
+    </div>
+
+    <form id="login-form" class="login-form">
+      <label>Username</label>
+      <input type="text" id="login-username" required autocomplete="username">
+      <label>Password</label>
+      <div class="password-field">
+        <input type="password" id="login-password" required autocomplete="current-password">
+        <button type="button" class="toggle-password" data-target="login-password" aria-label="Show password">
+          <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="icon-eye-off hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+        </button>
+      </div>
+      <button type="submit" class="btn-primary full">Sign in</button>
+      <div class="form-msg" id="login-msg"></div>
+    </form>
+
+    <form id="register-form" class="login-form hidden">
+      <p class="form-note">
+        This creates the first <strong>Administrator</strong> account for a brand-new
+        deployment. Once any account exists, this option disappears — every user after
+        that is created by an Admin from inside the app.
+      </p>
+      <label>Username</label>
+      <input type="text" id="reg-username" required>
+      <label>Email</label>
+      <input type="email" id="reg-email" required>
+      <label>Password</label>
+      <div class="password-field">
+        <input type="password" id="reg-password" required minlength="6">
+        <button type="button" class="toggle-password" data-target="reg-password" aria-label="Show password">
+          <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="icon-eye-off hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.6 10.6 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+        </button>
+      </div>
+      <button type="submit" class="btn-primary full">Create Administrator account</button>
+      <div class="form-msg" id="register-msg"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark small">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 18c3-4 6-4 8-1s5 3 8-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.55"/>
+          <rect x="3" y="7" width="10" height="7" rx="1" fill="currentColor"/>
+          <path d="M13 9h3.2c.4 0 .8.2 1 .6l1.8 2.6c.2.3.3.6.3 1V14h-6.3V9Z" fill="currentColor"/>
+          <circle cx="7" cy="15.2" r="1.5" fill="#fff"/>
+          <circle cx="7" cy="15.2" r="0.7" fill="currentColor"/>
+          <circle cx="16.5" cy="15.2" r="1.5" fill="#fff"/>
+          <circle cx="16.5" cy="15.2" r="0.7" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="brand-name small">FleetFlow</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="dashboard" data-roles="admin,fleet_manager,dispatcher">Dashboard</button>
+      <button class="nav-item" data-view="driver-dashboard" data-roles="driver">Driver Dashboard</button>
+      <button class="nav-item" data-view="tracking" data-roles="admin,fleet_manager,dispatcher,driver">Live Tracking</button>
+      <button class="nav-item" data-view="vehicles" data-roles="admin,fleet_manager">Vehicles</button>
+      <button class="nav-item" data-view="drivers" data-roles="admin,fleet_manager,dispatcher">Drivers</button>
+      <button class="nav-item" data-view="shipments" data-roles="admin,fleet_manager,dispatcher">Shipments</button>
+      <button class="nav-item" data-view="my-shipments" data-roles="driver">My Shipments</button>
+      <button class="nav-item" data-view="trips" data-roles="admin,fleet_manager,dispatcher">Trips</button>
+      <button class="nav-item" data-view="my-trips" data-roles="driver">My Trips</button>
+      <button class="nav-item" data-view="fuel" data-roles="admin,fleet_manager">Fuel</button>
+      <button class="nav-item" data-view="maintenance" data-roles="admin,fleet_manager">Maintenance</button>
+      <button class="nav-item" data-view="reports" data-roles="admin,fleet_manager">Reports &amp; Analytics</button>
+      <button class="nav-item" data-view="users" data-roles="admin">User Management</button>
+      <button class="nav-item" data-view="profile" data-roles="admin,fleet_manager,dispatcher,driver">Profile</button>
+    </nav>
+    <button id="logout-btn" class="logout-btn">Log out</button>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div id="view-title" class="view-title">Dashboard</div>
+      <div class="topbar-right">
+        <button id="notif-bell" class="notif-bell" title="Notifications">
+          🔔<span id="notif-count" class="notif-count hidden">0</span>
+        </button>
+        <div id="topbar-user" class="topbar-user"></div>
+      </div>
+    </header>
+
+    <div id="notif-panel" class="notif-panel hidden">
+      <div class="notif-panel-header">
+        <span>Notifications</span>
+        <button id="notif-mark-all" class="link-btn">Mark all read</button>
+      </div>
+      <div id="notif-list" class="notif-list"><div class="loading">No notifications</div></div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <div class="cards-grid" id="dashboard-cards"><div class="loading">Loading dashboard…</div></div>
+      <div class="charts-grid">
+        <div class="chart-card"><h3>Fleet Utilization Trend</h3><div class="chart-canvas-wrap"><canvas id="chart-utilization"></canvas></div></div>
+        <div class="chart-card"><h3>Vehicle Status Distribution</h3><div class="chart-canvas-wrap"><canvas id="chart-vehicle-status"></canvas></div></div>
+        <div class="chart-card"><h3>Shipment Delivery Performance</h3><div class="chart-canvas-wrap"><canvas id="chart-shipment-status"></canvas></div></div>
+        <div class="chart-card"><h3>Fuel Consumption</h3><div class="chart-canvas-wrap"><canvas id="chart-fuel"></canvas></div></div>
+        <div class="chart-card"><h3>Delivery / ETA Performance</h3><div class="chart-canvas-wrap"><canvas id="chart-eta"></canvas></div></div>
+        <div class="chart-card"><h3>Maintenance Overview</h3><div class="chart-canvas-wrap"><canvas id="chart-maintenance"></canvas></div></div>
+      </div>
+
+      <h3 class="section-subheading">Operations</h3>
+      <div class="ops-grid">
+        <div class="ops-card">
+          <h3>Active Shipments</h3>
+          <div id="ops-active-shipments" class="loading">Loading…</div>
+        </div>
+        <div class="ops-card">
+          <h3>Upcoming Maintenance</h3>
+          <div id="ops-upcoming-maintenance" class="loading">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRACKING -->
+    <section id="view-tracking" class="view">
+      <p class="tracking-note">
+        Shows pickup, destination, and route for active shipments. When a driver has
+        started their trip and their browser is reporting location, the vehicle marker
+        shows their <strong>real, periodically-updated position</strong> (see "last updated" in
+        the popup). Until then, position is <strong>estimated</strong> along the route based on
+        elapsed time — never shown as live GPS unless it actually is.
+      </p>
+      <div id="tracking-active-table" class="table-wrap"></div>
+      <div id="tracking-map" class="tracking-map"></div>
+      <div id="tracking-empty" class="hidden loading">No active shipments with a route yet. Optimize a route from a trip to see it here.</div>
+    </section>
+
+    <!-- VEHICLES -->
+    <section id="view-vehicles" class="view">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="vehicles-search" placeholder="Search by registration number...">
+        <button class="btn-primary" data-modal="vehicle-modal">+ Add Vehicle</button>
+      </div>
+      <div class="table-wrap"><table id="vehicles-table"><thead><tr>
+        <th>ID</th><th>Registration No.</th><th>Type</th><th>Capacity</th><th>Fuel Type</th><th>Status</th>
+      </tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- DRIVERS -->
+    <section id="view-drivers" class="view">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="drivers-search" placeholder="Search by name or license...">
+        <button class="btn-primary" data-modal="driver-modal">+ Add Driver</button>
+      </div>
+      <div class="table-wrap"><table id="drivers-table"><thead><tr>
+        <th>ID</th><th>Name</th><th>License No.</th><th>Phone</th><th>Status</th><th>Performance</th>
+      </tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- SHIPMENTS -->
+    <section id="view-shipments" class="view">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="shipments-search" placeholder="Search by tracking number...">
+        <button class="btn-primary" data-modal="shipment-modal">+ Add Shipment</button>
+      </div>
+      <div class="table-wrap"><table id="shipments-table"><thead><tr>
+        <th>ID</th><th>Tracking No.</th><th>Origin</th><th>Destination</th><th>Status</th><th>Actions</th>
+      </tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- TRIPS -->
+    <section id="view-trips" class="view">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="trips-search" placeholder="Search trips...">
+        <button class="btn-primary" data-modal="trip-modal">+ Assign Trip</button>
+      </div>
+      <div class="table-wrap"><table id="trips-table"><thead><tr>
+        <th>ID</th><th>Driver</th><th>Vehicle</th><th>Status</th><th>Actions</th>
+      </tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- FUEL -->
+    <section id="view-fuel" class="view">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="fuel-search" placeholder="Search fuel records...">
+        <button class="btn-primary" data-modal="fuel-modal">+ Add Fuel Record</button>
+      </div>
+      <div class="table-wrap"><table id="fuel-table"><thead><tr>
+        <th>ID</th><th>Vehicle</th><th>Driver</th><th>Liters</th><th>Cost</th><th>Odometer</th>
+      </tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- MAINTENANCE -->
+    <section id="view-maintenance" class="view">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="maintenance-search" placeholder="Search maintenance records...">
+        <button class="btn-primary" data-modal="maintenance-modal">+ Schedule Maintenance</button>
+      </div>
+      <div class="table-wrap"><table id="maintenance-table"><thead><tr>
+        <th>ID</th><th>Vehicle</th><th>Category</th><th>Service Date</th><th>Status</th><th>Actions</th>
+      </tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- REPORTS / ANALYTICS -->
+    <section id="view-reports" class="view">
+      <div class="report-grid">
+        <div class="report-card">
+          <h3>Fuel Analytics</h3>
+          <div id="fuel-analytics-body" class="loading">Loading…</div>
+        </div>
+        <div class="report-card">
+          <h3>Operational Analytics</h3>
+          <div id="ops-analytics-body" class="loading">Loading…</div>
+        </div>
+      </div>
+
+      <h3 class="section-subheading">Export Reports</h3>
+      <div class="export-grid" id="export-grid"></div>
+    </section>
+
+    <!-- DRIVER DASHBOARD -->
+    <section id="view-driver-dashboard" class="view">
+      <div class="cards-grid" id="driver-summary-cards"><div class="loading">Loading…</div></div>
+      <h3 class="section-subheading">Today's Schedule</h3>
+      <div id="driver-today" class="loading">Loading…</div>
+      <h3 class="section-subheading">Active / Upcoming Trips</h3>
+      <div id="driver-active-trips" class="loading">Loading…</div>
+    </section>
+
+    <!-- MY TRIPS (Driver) -->
+    <section id="view-my-trips" class="view">
+      <div id="my-trips-list" class="loading">Loading…</div>
+    </section>
+
+    <!-- MY SHIPMENTS (Driver) -->
+    <section id="view-my-shipments" class="view">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tracking #</th><th>Origin</th><th>Destination</th><th>Status</th><th>ETA</th></tr></thead>
+          <tbody id="my-shipments-body"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- USER MANAGEMENT (Admin) -->
+    <section id="view-users" class="view">
+      <div class="toolbar">
+        <div></div>
+        <button class="btn-primary" onclick="openUserModal()">+ Create User</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Driver Link</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="users-body"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="view-profile" class="view">
+      <div class="profile-card" id="profile-body">Loading…</div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-overlay hidden" id="modal-overlay">
+
+  <form class="modal" id="completion-modal">
+    <h3>Complete Delivery</h3>
+    <label>Completion Note</label>
+    <textarea name="completion_note" rows="4" required placeholder="Delivery completed successfully. Package handed over to customer at destination." maxlength="1000"></textarea>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Mark as Completed</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+  <div class="modal" id="confirm-delete-modal">
+    <h3 id="confirm-delete-title">Delete Record?</h3>
+    <p id="confirm-delete-body" class="form-note">This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="button" class="btn-danger" id="confirm-delete-btn">Delete</button>
+    </div>
+  </div>
+
+  <form class="modal" id="user-modal">
+    <h3>Create User</h3>
+    <label>Username</label><input required name="username">
+    <label>Email</label><input type="email" required name="email">
+    <label>Password</label><input type="password" required minlength="6" name="password">
+    <label>Role</label>
+    <select name="role" id="user-modal-role">
+      <option value="fleet_manager">Fleet Manager</option>
+      <option value="dispatcher">Dispatcher</option>
+      <option value="driver">Driver</option>
+      <option value="admin">Admin</option>
+    </select>
+    <label id="user-modal-driver-label" class="hidden">Link to Driver Record</label>
+    <select name="driver_id" id="user-modal-driver" class="hidden"></select>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Create User</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+  <form class="modal" id="vehicle-modal">
+    <h3>Add Vehicle</h3>
+    <label>Registration Number</label><input required name="registration_number">
+    <label>Vehicle Type</label><input required name="vehicle_type" placeholder="Truck, Van...">
+    <label>Capacity (tons)</label><input type="number" step="0.1" name="capacity">
+    <label>Fuel Type</label><input name="fuel_type" placeholder="Diesel, Petrol, Electric...">
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Save Vehicle</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+  <form class="modal" id="driver-modal">
+    <h3>Add Driver</h3>
+    <label>Full Name</label><input required name="name">
+    <label>License Number</label><input required name="license_number">
+    <label>Phone</label><input name="phone">
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Save Driver</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+  <form class="modal" id="shipment-modal">
+    <h3>Add Shipment</h3>
+    <label>Origin</label><input required name="origin">
+    <label>Destination</label><input required name="destination">
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Save Shipment</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+  <form class="modal" id="trip-modal">
+    <h3>Assign Trip</h3>
+    <label>Driver</label><select required name="driver_id"></select>
+    <label>Vehicle</label><select required name="vehicle_id"></select>
+    <label>Attach Shipment (optional)</label><select name="shipment_id"><option value="">— none —</option></select>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Assign Trip</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+  <form class="modal" id="fuel-modal">
+    <h3>Add Fuel Record</h3>
+    <label>Vehicle</label><select required name="vehicle_id"></select>
+    <label>Driver</label><select required name="driver_id"></select>
+    <label>Fuel Quantity (Liters)</label><input required type="number" step="0.1" name="fuel_quantity_liters">
+    <label>Fuel Cost</label><input required type="number" step="0.01" name="fuel_cost">
+    <label>Odometer Reading</label><input type="number" step="0.1" name="odometer_reading">
+    <label>Fuel Station</label><input name="fuel_station">
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Save Record</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+  <form class="modal" id="maintenance-modal">
+    <h3>Schedule Maintenance</h3>
+    <label>Vehicle</label><select required name="vehicle_id"></select>
+    <label>Category</label>
+    <select required name="category">
+      <option value="Oil Change">Oil Change</option>
+      <option value="Tyre Replacement">Tyre Replacement</option>
+      <option value="Brake Service">Brake Service</option>
+      <option value="Engine Service">Engine Service</option>
+      <option value="General Inspection">General Inspection</option>
+    </select>
+    <label>Service Date</label><input required type="date" name="service_date">
+    <label>Next Service Date</label><input type="date" name="next_service_date">
+    <label>Service Cost</label><input type="number" step="0.01" name="service_cost">
+    <label>Service Provider</label><input name="service_provider">
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" data-close>Cancel</button>
+      <button type="submit" class="btn-primary">Schedule</button>
+    </div>
+    <div class="form-msg"></div>
+  </form>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
